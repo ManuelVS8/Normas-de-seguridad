@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="google" content="notranlate">
+    <title>Materiales y productos elaborados</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/icono.ico">
+    <style>
+        /* ====== Reset & base ====== */
+        * { box-sizing: border-box; margin:0; padding:0; }
+        :root{
+            --blue-dark:#04032B;
+            --blue-700:#1a3a5f;
+            --blue-600:#254fba;
+            --orange:#f59e42;
+            --orange-700:#e67e22;
+            --bg-grad-1:#1a3a5f;
+            --bg-grad-2:#0d2340;
+            --white:#ffffff;
+            --green:#2ecc71;
+            --red:#e74c3c;
+            --panel:#E8EAFF;
+        }
+        body{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+            min-height:100vh; 
+            display:flex; 
+            justify-content:center; 
+            align-items: flex-start; 
+            color:#333; 
+            padding: 40px 10px 20px 10px; 
+        }
+        .game-container{
+            background:var(--white); border-radius:16px; box-shadow:0 12px 24px rgba(0,0,0,.12);
+            padding:1.5rem; max-width:980px; width:100%; min-height:640px; position:relative; overflow:hidden;
+            display:flex; flex-direction:column;
+        }
+        header{ text-align:center; margin-bottom:.8rem; margin-top:0.5rem; }
+        h1{ color:var(--blue-dark); font-size:clamp(1.8rem,5vw,2.8rem); font-weight:900; letter-spacing:.5px; margin-bottom: 0.5rem; }
+        .subtitle{ color:var(--blue-700); font-size:clamp(1rem,3vw,1.3rem); margin-top:.25rem; font-weight: 600; line-height: 1.4; }
+        .highlight-keyword{ color:var(--orange); font-weight:800; }
+        .text-green { color: var(--green); font-weight: 800; }
+        .text-red { color: var(--red); font-weight: 800; }
+
+        /* Buttons Base */
+        .btn{ color:#fff; border:none; border-radius:12px; cursor:pointer; font-weight:800;
+            transition:transform .1s ease, box-shadow .2s ease, background-color .25s ease;
+            display:inline-flex; align-items:center; justify-content:center; font-size: 1.1rem; gap: 10px; }
+        .btn:hover{ transform:translateY(-3px); box-shadow:0 6px 14px rgba(0,0,0,.15); }
+        .btn:active{ transform:translateY(0); }
+        
+        .btn-start { background: var(--orange); margin: 1rem auto; padding: 0.75rem 2rem; height: 55px; font-size: 1.3rem; min-width: 200px; }
+
+        /* Pantallas */
+        .screen{ display:none; animation:fadeIn .4s ease; flex-direction: column; flex:1; width: 100%; }
+        .screen.active{ display:flex; }
+        @keyframes fadeIn{ from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);} }
+
+        /* Info & Progress */
+        .game-info{ display:flex; gap:1rem; align-items:center; justify-content:space-between; margin:1rem 0; width: 100%; }
+        .timer{ font-weight:900; color:var(--blue-700); font-size:1.2rem; min-width: 100px; text-align: right; }
+        .progress-bar{ flex:1; height:14px; background:#e6f2ff; border-radius:999px; overflow:hidden; border: 1px solid #d3e2ff; }
+        .progress-fill{ height:100%; width:0%; background: var(--orange); transition:width .4s ease; }
+
+        /* Pantalla Inicio */
+        .start-content{ display:flex; flex-direction:column; align-items:center; flex:1; padding:1rem; text-align: center; }
+        .advice-box{ background:var(--panel); border-left:5px solid var(--blue-700); padding:1.5rem; border-radius:12px;
+            color:var(--blue-700); max-width:800px; font-size:1.2rem; line-height: 1.6; margin-bottom: 1.5rem; }
+        .advice-anim-text { display: block; text-align: center; font-weight: 900; margin-top: 1rem; font-size: 1.5rem; }
+        .start-image-container { width: 100%; display: flex; justify-content: center; margin-top: auto; }
+        .start-image{ max-width: 450px; width: 100%; height: auto; }
+
+        .mute-btn{ position:absolute; top:1rem; right:1rem; background:var(--orange); color:#fff; border:2px solid #fff; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; z-index:100; }
+
+        /* Juego 2: Efecto flotante y Ghosting */
+        .j2-board { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1rem; max-width: 700px; margin: 0 auto; flex:1; align-content: center; }
+        .column { display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+        
+        .match-item { 
+            width: 140px; height: 105px; border-radius: 12px; border: 4px solid #d3e2ff; cursor: pointer;
+            background-size: cover; background-repeat: no-repeat; background-position: center;
+            background-color: #white; transition: all 0.3s ease;
+        }
+        
+        /* Animación flotante para selección */
+        @keyframes itemPulse {
+            0% { transform: scale(1.05); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(37, 79, 186, 0.4); }
+            100% { transform: scale(1.05); }
+        }
+        
+        /* Estado Seleccionado: Flota y tiene borde azul */
+        .match-item.selected:not(.matched) { 
+            border-color: var(--blue-600); 
+            animation: itemPulse 1s infinite ease-in-out; 
+            z-index: 10; 
+        }
+        
+        /* Estado Emparejado (Ghosting): Desaparece suavemente */
+        .match-item.matched { 
+            pointer-events: none; 
+            filter: grayscale(1) opacity(0.3); 
+            border-color: #ccc;
+            transform: scale(0.9) !important;
+            animation: none !important; 
+        }
+
+        /* Pantalla Final */
+        .results{ display:flex; flex-direction:column; align-items:center; gap:0.8rem; text-align:center; flex:1; justify-content:center; padding: 1rem; }
+        .big-score{ font-size:clamp(3rem,8vw,4.5rem); color:var(--blue-600); font-weight:900; margin: 0.5rem 0; }
+        #trophyBox { display: none; font-size: 5.5rem; animation: bounce 1s ease infinite; margin-bottom: 0.5rem; }
+        @keyframes bounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+        .final-time { font-size: 1.3rem; color: var(--blue-700); font-weight: 600; margin-bottom: 0.5rem; }
+        .school-logo { width: 180px; margin-top: 1rem; }
+        .credit { font-weight: 700; color: #555; }
+
+        /* Animaciones Globales */
+        .shake { animation: shakeAnim 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shakeAnim {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .confetti{ position:fixed; width:12px; height:12px; border-radius:50%; animation: confetti-fall 3s linear forwards; z-index:1000; pointer-events: none; }
+        @keyframes confetti-fall{ 0%{ transform:translate(0, -20px) rotate(0); opacity:1;} 100%{ transform:translate(var(--tx), var(--ty)) rotate(360deg); opacity:0; } }
+
+        @media (max-width: 450px) {
+            .match-item { width: 120px; height: 90px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="mainWrapper">
+    <button class="mute-btn" id="muteBtn">🔊</button>
+
+    <section class="screen active" id="startScreen">
+        <header>
+            <h1>Materiales y productos elaborados</h1>
+            <div class="subtitle">Relaciona los materiales con su producto elaborado</div>
+        </header>
+        <div class="start-content">
+            <div class="advice-box">
+                Recuerda: elegimos los <span class="highlight-keyword">materiales</span> dependiendo de sus características para fabricar <span class="highlight-keyword">productos</span> <span class="highlight-keyword">elaborados</span>.
+                <div class="advice-anim-text">¡Buena suerte!</div>
+            </div>
+            <div class="start-image-container">
+                <img class="start-image" src="https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/refs/heads/main/Ni%C3%B1os.png" alt="Niños">
+            </div>
+            <button class="btn btn-start" id="startBtn">Comenzar</button>
+        </div>
+    </section>
+
+    <section class="screen" id="gameScreen">
+        <header>
+            <h1>Materiales y productos elaborados</h1>
+            <div class="subtitle">Relaciona cada material con su producto elaborado.</div>
+        </header>
+        <div class="game-info">
+            <div class="progress-bar"><div class="progress-fill" id="progGame"></div></div>
+            <div class="timer" id="timerDisplay">00:00.0</div>
+        </div>
+        <div class="j2-board" id="matchBoard">
+            <div class="column" id="colRaw"></div>
+            <div class="column" id="colProd"></div>
+        </div>
+    </section>
+
+    <section class="screen" id="finalScreen">
+        <header><h1>Materiales y productos elaborados</h1></header>
+        <div class="results">
+            <div id="trophyBox">🏆</div>
+            <div style="font-size: 1.5rem; font-weight: 700;">Puntuación:</div>
+            <div class="big-score" id="finalScore">0</div>
+            <div class="final-time">Tiempo total: <span id="totalTime">00:00.0</span></div>
+            <div id="finalMsg" class="subtitle" style="margin-bottom: 1.5rem;"></div>
+            <button class="btn btn-start" id="restartBtn">Volver al menú</button>
+            <div class="credit">Creado por Manuel J. Ventura</div>
+            <img class="school-logo" src="https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/refs/heads/main/Siurot.png" alt="Logo Colegio">
+        </div>
+    </section>
+</div>
+
+<script>
+    // --- Configuración de Audio (URLs corregidas con ?raw=true) ---
+    const audioFiles = {
+        completado: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Completado.mp3',
+        correcto: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Correcto.mp3',
+        victoria: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Termin%C3%A9.mp3',
+        error: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Error.mp3',
+        tap: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Tap.mp3'
+    };
+
+    // --- Datos del Juego ---
+    const ALL_PAIRS = [
+        { id: 1, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Algod%C3%B3n.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Camiseta.png' },
+        { id: 2, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Arcilla.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Vasija.png' },
+        { id: 3, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Granito.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Carretera.png' },
+        { id: 4, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Lana.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Chaleco.png' },
+        { id: 5, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Marmol.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Estatua.png' },
+        { id: 6, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Hierro.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Sart%C3%A9n.png' },
+        { id: 7, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Madera.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Silla.png' },
+        { id: 8, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Petroleo.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Pl%C3%A1stico.png' },
+        { id: 9, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Piel.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/bolso.png' },
+        { id: 10, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/mimbre1.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/mimbre2.png' }
+    ];
+
+    // --- Variables de Estado ---
+    let isMuted = false, startTime = 0, timerInterval = null, totalElapsed = 0;
+    let currentLevel = 1;
+    let levelPairs = [];
+    let totalMatches = 0;
+    let totalAttempts = 0;
+    let selectedRaw = null, selectedProd = null;
+    
+    // Precarga de audios
+    const audioObjects = {};
+    Object.keys(audioFiles).forEach(key => {
+        audioObjects[key] = new Audio(audioFiles[key]);
+        audioObjects[key].load();
+    });
+
+    // --- Funciones de Utilidad ---
+    function playSnd(key) {
+        if(isMuted) return;
+        const a = audioObjects[key];
+        if (!a) return;
+        a.currentTime = 0;
+        a.play().catch(e => console.log("Audio play error (interaction needed?):", e));
+    }
+
+    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+    
+    function formatTime(ms) {
+        const d = ms / 1000;
+        const m = Math.floor(d / 60).toString().padStart(2, '0');
+        const s = Math.floor(d % 60).toString().padStart(2, '0');
+        const dec = Math.round((d % 1) * 10);
+        return `${m}:${s}.${dec}`;
+    }
+
+    function applyShake(id) {
+        const el = document.getElementById(id);
+        el.classList.remove('shake');
+        void el.offsetWidth; // Trigger reflow
+        el.classList.add('shake');
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- Lógica del Juego ---
+
+    function startGame() {
+        // Desbloqueo de AudioContext
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        if (context.state === 'suspended') context.resume();
+        
+        playSnd('tap');
+        showScreen('gameScreen');
+        
+        // Iniciar variables
+        currentLevel = 1;
+        totalMatches = 0;
+        totalAttempts = 0;
+        totalElapsed = 0;
+        
+        // Iniciar Timer
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            totalElapsed = Date.now() - startTime;
+            document.getElementById('timerDisplay').textContent = formatTime(totalElapsed);
+        }, 100);
+
+        // Barajar los 10 pares una vez y dividir en niveles
+        const shuffledAll = shuffle([...ALL_PAIRS]);
+        levelPairs = [
+            shuffledAll.slice(0, 5), // Nivel 1
+            shuffledAll.slice(5, 10) // Nivel 2
+        ];
+
+        loadLevel();
+    }
+
+    function loadLevel() {
+        selectedRaw = null;
+        selectedProd = null;
+        
+        const pairs = levelPairs[currentLevel - 1];
+        const colRaw = document.getElementById('colRaw');
+        const colProd = document.getElementById('colProd');
+        colRaw.innerHTML = ''; 
+        colProd.innerHTML = '';
+
+        // Barajar presentación dentro de cada columna
+        const rawList = shuffle([...pairs]);
+        const prodList = shuffle([...pairs]);
+
+        rawList.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'match-item'; 
+            div.style.backgroundImage = `url(${p.raw})`;
+            div.dataset.id = p.id;
+            div.dataset.type = 'raw';
+            div.onclick = () => handleMatchClick(div);
+            colRaw.appendChild(div);
+        });
+
+        prodList.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'match-item'; 
+            div.style.backgroundImage = `url(${p.prod})`;
+            div.dataset.id = p.id;
+            div.dataset.type = 'prod';
+            div.onclick = () => handleMatchClick(div);
+            colProd.appendChild(div);
+        });
+
+        updateProgress();
+    }
+
+    function updateProgress() {
+        // Progreso total sobre 10 pares
+        const percent = (totalMatches / 10) * 100;
+        document.getElementById('progGame').style.width = percent + '%';
+    }
+
+    function handleMatchClick(el) {
+        if(el.classList.contains('matched')) return;
+
+        const type = el.dataset.type;
+        const isRaw = type === 'raw';
+        
+        // Determinar variables de selección
+        let currentSelection = isRaw ? selectedRaw : selectedProd;
+        let otherSelection = isRaw ? selectedProd : selectedRaw;
+
+        // CASO 1: No hay nada seleccionado en NINGUNA columna -> Sonido TAP
+        if (!currentSelection && !otherSelection) {
+            playSnd('tap');
+            el.classList.add('selected');
+            if (isRaw) selectedRaw = el; else selectedProd = el;
+            return;
+        }
+
+        // CASO 2: Hay algo seleccionado en la OTRA columna -> INTENTO DE EMPAREJAMIENTO
+        if (otherSelection) {
+            el.classList.add('selected');
+            if (isRaw) selectedRaw = el; else selectedProd = el;
+            
+            checkMatch();
+            return; 
+        }
+
+        // CASO 3: Hay algo seleccionado en la MISMA columna
+        if (currentSelection) {
+            if (currentSelection === el) {
+                // Deseleccionar
+                el.classList.remove('selected');
+                if (isRaw) selectedRaw = null; else selectedProd = null;
+                playSnd('tap');
+            } else {
+                // Cambiar selección
+                currentSelection.classList.remove('selected');
+                el.classList.add('selected');
+                if (isRaw) selectedRaw = el; else selectedProd = el;
+                playSnd('tap');
+            }
+        }
+    }
+
+    function checkMatch() {
+        if(!selectedRaw || !selectedProd) return;
+
+        totalAttempts++;
+        
+        if(selectedRaw.dataset.id === selectedProd.dataset.id) {
+            playSnd('correcto');
+            
+            selectedRaw.classList.add('matched'); 
+            selectedProd.classList.add('matched');
+            selectedRaw.classList.remove('selected');
+            selectedProd.classList.remove('selected');
+            
+            totalMatches++;
+            updateProgress();
+            
+            // Verificar si nivel completado
+            const levelMatchCount = levelPairs[currentLevel - 1].length;
+            // Contar cuántos matched hay en el tablero actual
+            const matchedCount = document.querySelectorAll('.match-item.matched').length;
+
+            if (matchedCount === levelMatchCount * 2) { // *2 porque son pares (raw + prod)
+                if (currentLevel === 1) {
+                    // Pasar al nivel 2
+                    currentLevel = 2;
+                    setTimeout(() => {
+                        playSnd('completado');
+                        loadLevel();
+                    }, 800);
+                } else {
+                    // Juego terminado
+                    setTimeout(showFinal, 800);
+                }
+            }
+            
+            selectedRaw = null; 
+            selectedProd = null;
+
+        } else {
+            playSnd('error');
+            applyShake('matchBoard');
+            
+            const r = selectedRaw, p = selectedProd;
+            
+            // Quitamos selección tras breve momento
+            setTimeout(() => { 
+                r.classList.remove('selected'); 
+                p.classList.remove('selected'); 
+            }, 400);
+            
+            selectedRaw = null; 
+            selectedProd = null;
+        }
+    }
+
+    // --- Pantalla Final ---
+    function showFinal() {
+        clearInterval(timerInterval);
+        showScreen('finalScreen');
+        
+        // Cálculo de puntuación: (parejas_totales / intentos) * 100
+        let finalScore = 0;
+        if (totalAttempts > 0) {
+            finalScore = Math.round((totalMatches / totalAttempts) * 100);
+        }
+        
+        document.getElementById('finalScore').textContent = finalScore;
+        document.getElementById('totalTime').textContent = formatTime(totalElapsed);
+
+        if(finalScore === 100) {
+            document.getElementById('trophyBox').style.display = 'block';
+            document.getElementById('finalMsg').textContent = '¡Enhorabuena, puntuación máxima!';
+            playSnd('victoria');
+            createConfetti();
+        } else {
+            document.getElementById('trophyBox').style.display = 'none';
+            document.getElementById('finalMsg').textContent = '¡Buen trabajo! Sigue practicando';
+            playSnd('completado');
+        }
+    }
+
+    function createConfetti() {
+        for(let i=0; i<100; i++){
+            setTimeout(() => {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.top = '-10px';
+                c.style.backgroundColor = ['#f59e42', '#2ecc71', '#254fba'][Math.floor(Math.random()*3)];
+                c.style.setProperty('--tx', (Math.random()-0.5) * 400 + 'px');
+                c.style.setProperty('--ty', window.innerHeight + 'px');
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 3000);
+            }, i * 30);
+        }
+    }
+
+    // --- Eventos ---
+    document.getElementById('startBtn').onclick = startGame;
+    
+    document.getElementById('restartBtn').onclick = () => {
+        playSnd('tap');
+        location.reload(); 
+    };
+    
+    document.getElementById('muteBtn').onclick = () => { 
+        isMuted = !isMuted; 
+        document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🔊'; 
+    };
+</script>
+</body>
+</html>
