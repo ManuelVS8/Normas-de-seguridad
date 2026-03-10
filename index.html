@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <meta name="google" content="notranlate">
-    <title>Materiales y productos elaborados</title>
+    <title>Las normas de seguridad</title>
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/icono.ico">
     <style>
         /* ====== Reset & base ====== */
@@ -74,38 +74,61 @@
 
         .mute-btn{ position:absolute; top:1rem; right:1rem; background:var(--orange); color:#fff; border:2px solid #fff; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; z-index:100; }
 
-        /* Juego 2: Efecto flotante y Ghosting */
-        .j2-board { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1rem; max-width: 700px; margin: 0 auto; flex:1; align-content: center; }
-        .column { display: flex; flex-direction: column; gap: 1rem; align-items: center; }
-        
-        .match-item { 
-            width: 140px; height: 105px; border-radius: 12px; border: 4px solid #d3e2ff; cursor: pointer;
-            background-size: cover; background-repeat: no-repeat; background-position: center;
-            background-color: #white; transition: all 0.3s ease;
+        /* Juego 1: Layout estable */
+        .j1-display { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; padding: 1rem; flex:1; justify-content: center; }
+        .text-card { 
+            width: 100%; max-width: 600px; min-height: 140px; background: #fff; border: 4px solid #e6f2ff; border-radius: 20px; 
+            overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(0,0,0,0.08); 
+            padding: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--blue-dark);
+            line-height: 1.4;
+        }
+
+        /* Botón Play Personalizado */
+        .btn-play-audio {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--blue-600);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            padding-left: 5px; /* Ajuste óptico para centrar triángulo */
+        }
+        .btn-play-audio:hover {
+            transform: scale(1.1);
+            background-color: var(--blue-700);
+        }
+        .btn-play-audio:active {
+            transform: scale(0.95);
+        }
+        /* Triángulo Blanco con CSS puro */
+        .play-icon {
+            width: 0; 
+            height: 0; 
+            border-left: 18px solid white; 
+            border-top: 11px solid transparent; 
+            border-bottom: 11px solid transparent;
         }
         
-        /* Animación flotante para selección */
-        @keyframes itemPulse {
-            0% { transform: scale(1.05); }
-            50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(37, 79, 186, 0.4); }
-            100% { transform: scale(1.05); }
-        }
+        .j1-controls { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; width: 100%; }
         
-        /* Estado Seleccionado: Flota y tiene borde azul */
-        .match-item.selected:not(.matched) { 
-            border-color: var(--blue-600); 
-            animation: itemPulse 1s infinite ease-in-out; 
-            z-index: 10; 
+        /* Ajuste Botones J1: Columna para alinear texto y emoji */
+        .btn-j1 { 
+            width: 160px; 
+            height: 120px; 
+            flex-direction: column; /* Apila elementos verticalmente */
+            padding: 10px; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+            font-size: 1.2rem; 
+            line-height: 1.2;
+            justify-content: center; /* Centra verticalmente el contenido */
         }
-        
-        /* Estado Emparejado (Ghosting): Desaparece suavemente */
-        .match-item.matched { 
-            pointer-events: none; 
-            filter: grayscale(1) opacity(0.3); 
-            border-color: #ccc;
-            transform: scale(0.9) !important;
-            animation: none !important; 
-        }
+        .btn-green { background-color: var(--green) !important; }
+        .btn-red { background-color: var(--red) !important; }
 
         /* Pantalla Final */
         .results{ display:flex; flex-direction:column; align-items:center; gap:0.8rem; text-align:center; flex:1; justify-content:center; padding: 1rem; }
@@ -129,7 +152,10 @@
         @keyframes confetti-fall{ 0%{ transform:translate(0, -20px) rotate(0); opacity:1;} 100%{ transform:translate(var(--tx), var(--ty)) rotate(360deg); opacity:0; } }
 
         @media (max-width: 450px) {
-            .match-item { width: 120px; height: 90px; }
+            .text-card { font-size: 1.2rem; min-height: 120px; }
+            .btn-j1 { width: 140px; height: 100px; }
+            .btn-play-audio { width: 50px; height: 50px; }
+            .play-icon { border-left-width: 15px; border-top-width: 9px; border-bottom-width: 9px; }
         }
     </style>
 </head>
@@ -140,12 +166,12 @@
 
     <section class="screen active" id="startScreen">
         <header>
-            <h1>Materiales y productos elaborados</h1>
-            <div class="subtitle">Relaciona los materiales con su producto elaborado</div>
+            <h1>Las normas de seguridad</h1>
+            <div class="subtitle">Aprende las normas de seguridad más importantes.</div>
         </header>
         <div class="start-content">
             <div class="advice-box">
-                Recuerda: elegimos los <span class="highlight-keyword">materiales</span> dependiendo de sus características para fabricar <span class="highlight-keyword">productos</span> <span class="highlight-keyword">elaborados</span>.
+                Recuerda: cuando usamos máquinas, es muy importante tomar las <span class="highlight-keyword">medidas de precaución</span> necesarias y conocer las <span class="highlight-keyword">normas de seguridad</span>.
                 <div class="advice-anim-text">¡Buena suerte!</div>
             </div>
             <div class="start-image-container">
@@ -157,21 +183,31 @@
 
     <section class="screen" id="gameScreen">
         <header>
-            <h1>Materiales y productos elaborados</h1>
-            <div class="subtitle">Relaciona cada material con su producto elaborado.</div>
+            <h1>Las normas de seguridad</h1>
+            <div class="subtitle">Indica si las siguientes normas de seguridad son <span class="text-green">verdaderas</span> o <span class="text-red">falsas</span>.</div>
         </header>
         <div class="game-info">
             <div class="progress-bar"><div class="progress-fill" id="progGame"></div></div>
             <div class="timer" id="timerDisplay">00:00.0</div>
         </div>
-        <div class="j2-board" id="matchBoard">
-            <div class="column" id="colRaw"></div>
-            <div class="column" id="colProd"></div>
+        <div class="j1-display" id="gameBoard">
+            <div class="text-card" id="textCard">Pulsa comenzar para iniciar</div>
+            
+            <!-- Botón Play Añadido -->
+            <button class="btn-play-audio" id="btnReplay" title="Escuchar de nuevo">
+                <div class="play-icon"></div>
+            </button>
+
+            <div class="j1-controls">
+                <!-- Cambiado a estructura vertical: Palabra <br> Emoji -->
+                <button class="btn btn-j1 btn-green" id="btnTrue">Verdadero<br>🦺</button>
+                <button class="btn btn-j1 btn-red" id="btnFalse">Falso<br>⚠️</button>
+            </div>
         </div>
     </section>
 
     <section class="screen" id="finalScreen">
-        <header><h1>Materiales y productos elaborados</h1></header>
+        <header><h1 style="color: var(--blue-dark);">Partes de un ordenador</h1></header>
         <div class="results">
             <div id="trophyBox">🏆</div>
             <div style="font-size: 1.5rem; font-weight: 700;">Puntuación:</div>
@@ -186,7 +222,7 @@
 </div>
 
 <script>
-    // --- Configuración de Audio (URLs corregidas con ?raw=true) ---
+    // --- Configuración de Audio (URLs) ---
     const audioFiles = {
         completado: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Completado.mp3',
         correcto: 'https://github.com/ManuelVS8/Efectos_audio/raw/main/Correcto.mp3',
@@ -196,26 +232,24 @@
     };
 
     // --- Datos del Juego ---
-    const ALL_PAIRS = [
-        { id: 1, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Algod%C3%B3n.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Camiseta.png' },
-        { id: 2, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Arcilla.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Vasija.png' },
-        { id: 3, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Granito.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Carretera.png' },
-        { id: 4, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Lana.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Chaleco.png' },
-        { id: 5, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Marmol.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Estatua.png' },
-        { id: 6, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Hierro.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Sart%C3%A9n.png' },
-        { id: 7, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Madera.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Silla.png' },
-        { id: 8, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Petroleo.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Pl%C3%A1stico.png' },
-        { id: 9, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/Piel.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/bolso.png' },
-        { id: 10, raw: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/mimbre1.png', prod: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/C_MEDIO1/Productos/mimbre2.png' }
+    const QUESTIONS = [
+        { text: "Usar casco y ropa de seguridad en trabajos de riesgo.", isCorrect: true },
+        { text: "Usar máquinas eléctricas con las manos mojadas.", isCorrect: false },
+        { text: "Usar ropa y herramientas aislantes en trabajos con electricidad.", isCorrect: true },
+        { text: "Llevar ropa suelta y objetos como colgantes o pulseras.", isCorrect: false },
+        { text: "Estar atento y evitar distracciones.", isCorrect: true },
+        { text: "Usar guantes solo en invierno.", isCorrect: false },
+        { text: "Usar arnés en trabajos de altura.", isCorrect: true },
+        { text: "Mantener la zona de trabajo desordenada.", isCorrect: false },
+        { text: "Leer las normas de uso de las máquinas.", isCorrect: true },
+        { text: "Ignorar las normas de seguridad.", isCorrect: false }
     ];
 
     // --- Variables de Estado ---
     let isMuted = false, startTime = 0, timerInterval = null, totalElapsed = 0;
-    let currentLevel = 1;
-    let levelPairs = [];
-    let totalMatches = 0;
-    let totalAttempts = 0;
-    let selectedRaw = null, selectedProd = null;
+    let currentQuestionIdx = 0;
+    let activeQuestions = [];
+    let score = 0;
     
     // Precarga de audios
     const audioObjects = {};
@@ -224,13 +258,67 @@
         audioObjects[key].load();
     });
 
+    // --- Configuración Voz (SpeechSynthesis) ---
+    let voiceSelected = null;
+
+    function loadVoices() {
+        const voices = speechSynthesis.getVoices();
+        if (voices.length === 0) return;
+
+        // 1. Prioridad Google
+        let foundVoice = voices.find(v => v.name === "Google español");
+
+        // 2. Alternativa Microsoft/Natural
+        if (!foundVoice) {
+            foundVoice = voices.find(v => 
+                (v.lang === 'es-ES' || v.lang.startsWith('es')) && 
+                (v.name.includes('Microsoft') || v.name.includes('Natural'))
+            );
+        }
+
+        // 3. Fallback inteligente
+        if (!foundVoice) {
+            foundVoice = voices.find(v => v.lang === 'es-ES' || v.lang.startsWith('es'));
+        }
+
+        if (foundVoice) {
+            voiceSelected = foundVoice;
+        }
+    }
+
+    // Cargar voces cuando estén listas
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    loadVoices(); // Intento inicial
+
+    function speakText(text) {
+        if (isMuted) return;
+        
+        // Cancelar audio previo para evitar solapamientos
+        speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        if (voiceSelected) {
+            utterance.voice = voiceSelected;
+        }
+        
+        utterance.lang = 'es-ES';
+        
+        // Velocidad 0.8 para mejor comprensión
+        utterance.rate = 0.8; 
+
+        speechSynthesis.speak(utterance);
+    }
+
     // --- Funciones de Utilidad ---
     function playSnd(key) {
         if(isMuted) return;
         const a = audioObjects[key];
         if (!a) return;
         a.currentTime = 0;
-        a.play().catch(e => console.log("Audio play error (interaction needed?):", e));
+        a.play().catch(e => console.log("Audio play error:", e));
     }
 
     function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
@@ -255,6 +343,11 @@
         document.getElementById(id).classList.add('active');
     }
 
+    function updateProgress() {
+        const percent = (currentQuestionIdx / activeQuestions.length) * 100;
+        document.getElementById('progGame').style.width = percent + '%';
+    }
+
     // --- Lógica del Juego ---
 
     function startGame() {
@@ -266,10 +359,12 @@
         showScreen('gameScreen');
         
         // Iniciar variables
-        currentLevel = 1;
-        totalMatches = 0;
-        totalAttempts = 0;
+        currentQuestionIdx = 0;
+        score = 0;
         totalElapsed = 0;
+        
+        // Barajar preguntas
+        activeQuestions = shuffle([...QUESTIONS]);
         
         // Iniciar Timer
         startTime = Date.now();
@@ -278,168 +373,56 @@
             document.getElementById('timerDisplay').textContent = formatTime(totalElapsed);
         }, 100);
 
-        // Barajar los 10 pares una vez y dividir en niveles
-        const shuffledAll = shuffle([...ALL_PAIRS]);
-        levelPairs = [
-            shuffledAll.slice(0, 5), // Nivel 1
-            shuffledAll.slice(5, 10) // Nivel 2
-        ];
-
-        loadLevel();
+        loadQuestion();
     }
 
-    function loadLevel() {
-        selectedRaw = null;
-        selectedProd = null;
-        
-        const pairs = levelPairs[currentLevel - 1];
-        const colRaw = document.getElementById('colRaw');
-        const colProd = document.getElementById('colProd');
-        colRaw.innerHTML = ''; 
-        colProd.innerHTML = '';
-
-        // Barajar presentación dentro de cada columna
-        const rawList = shuffle([...pairs]);
-        const prodList = shuffle([...pairs]);
-
-        rawList.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'match-item'; 
-            div.style.backgroundImage = `url(${p.raw})`;
-            div.dataset.id = p.id;
-            div.dataset.type = 'raw';
-            div.onclick = () => handleMatchClick(div);
-            colRaw.appendChild(div);
-        });
-
-        prodList.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'match-item'; 
-            div.style.backgroundImage = `url(${p.prod})`;
-            div.dataset.id = p.id;
-            div.dataset.type = 'prod';
-            div.onclick = () => handleMatchClick(div);
-            colProd.appendChild(div);
-        });
-
-        updateProgress();
-    }
-
-    function updateProgress() {
-        // Progreso total sobre 10 pares
-        const percent = (totalMatches / 10) * 100;
-        document.getElementById('progGame').style.width = percent + '%';
-    }
-
-    function handleMatchClick(el) {
-        if(el.classList.contains('matched')) return;
-
-        const type = el.dataset.type;
-        const isRaw = type === 'raw';
-        
-        // Determinar variables de selección
-        let currentSelection = isRaw ? selectedRaw : selectedProd;
-        let otherSelection = isRaw ? selectedProd : selectedRaw;
-
-        // CASO 1: No hay nada seleccionado en NINGUNA columna -> Sonido TAP
-        if (!currentSelection && !otherSelection) {
-            playSnd('tap');
-            el.classList.add('selected');
-            if (isRaw) selectedRaw = el; else selectedProd = el;
+    function loadQuestion() {
+        if (currentQuestionIdx >= activeQuestions.length) {
+            endGame();
             return;
         }
 
-        // CASO 2: Hay algo seleccionado en la OTRA columna -> INTENTO DE EMPAREJAMIENTO
-        if (otherSelection) {
-            el.classList.add('selected');
-            if (isRaw) selectedRaw = el; else selectedProd = el;
-            
-            checkMatch();
-            return; 
-        }
+        const q = activeQuestions[currentQuestionIdx];
+        const textCard = document.getElementById('textCard');
+        
+        textCard.textContent = q.text;
+        updateProgress();
+        
+        // Reproducir audio TTS
+        setTimeout(() => speakText(q.text), 300);
+    }
 
-        // CASO 3: Hay algo seleccionado en la MISMA columna
-        if (currentSelection) {
-            if (currentSelection === el) {
-                // Deseleccionar
-                el.classList.remove('selected');
-                if (isRaw) selectedRaw = null; else selectedProd = null;
-                playSnd('tap');
-            } else {
-                // Cambiar selección
-                currentSelection.classList.remove('selected');
-                el.classList.add('selected');
-                if (isRaw) selectedRaw = el; else selectedProd = el;
-                playSnd('tap');
-            }
+    // Función para el botón de replay manual
+    function replayCurrentAudio() {
+        if (currentQuestionIdx < activeQuestions.length) {
+            speakText(activeQuestions[currentQuestionIdx].text);
         }
     }
 
-    function checkMatch() {
-        if(!selectedRaw || !selectedProd) return;
-
-        totalAttempts++;
+    function checkAnswer(userSaidTrue) {
+        const q = activeQuestions[currentQuestionIdx];
+        const correctAnswer = q.isCorrect; // True si la frase es correcta (Verdadero)
         
-        if(selectedRaw.dataset.id === selectedProd.dataset.id) {
+        const isCorrect = (userSaidTrue === correctAnswer);
+
+        if (isCorrect) {
             playSnd('correcto');
-            
-            selectedRaw.classList.add('matched'); 
-            selectedProd.classList.add('matched');
-            selectedRaw.classList.remove('selected');
-            selectedProd.classList.remove('selected');
-            
-            totalMatches++;
-            updateProgress();
-            
-            // Verificar si nivel completado
-            const levelMatchCount = levelPairs[currentLevel - 1].length;
-            // Contar cuántos matched hay en el tablero actual
-            const matchedCount = document.querySelectorAll('.match-item.matched').length;
-
-            if (matchedCount === levelMatchCount * 2) { // *2 porque son pares (raw + prod)
-                if (currentLevel === 1) {
-                    // Pasar al nivel 2
-                    currentLevel = 2;
-                    setTimeout(() => {
-                        playSnd('completado');
-                        loadLevel();
-                    }, 800);
-                } else {
-                    // Juego terminado
-                    setTimeout(showFinal, 800);
-                }
-            }
-            
-            selectedRaw = null; 
-            selectedProd = null;
-
+            score++;
         } else {
             playSnd('error');
-            applyShake('matchBoard');
-            
-            const r = selectedRaw, p = selectedProd;
-            
-            // Quitamos selección tras breve momento
-            setTimeout(() => { 
-                r.classList.remove('selected'); 
-                p.classList.remove('selected'); 
-            }, 400);
-            
-            selectedRaw = null; 
-            selectedProd = null;
+            applyShake('gameBoard');
         }
+
+        currentQuestionIdx++;
+        loadQuestion();
     }
 
-    // --- Pantalla Final ---
-    function showFinal() {
+    function endGame() {
         clearInterval(timerInterval);
         showScreen('finalScreen');
         
-        // Cálculo de puntuación: (parejas_totales / intentos) * 100
-        let finalScore = 0;
-        if (totalAttempts > 0) {
-            finalScore = Math.round((totalMatches / totalAttempts) * 100);
-        }
+        const totalQuestions = activeQuestions.length;
+        const finalScore = Math.round((100 / totalQuestions) * score);
         
         document.getElementById('finalScore').textContent = finalScore;
         document.getElementById('totalTime').textContent = formatTime(totalElapsed);
@@ -475,6 +458,12 @@
     // --- Eventos ---
     document.getElementById('startBtn').onclick = startGame;
     
+    document.getElementById('btnTrue').onclick = () => checkAnswer(true);
+    document.getElementById('btnFalse').onclick = () => checkAnswer(false);
+    
+    // Evento para el botón de replay
+    document.getElementById('btnReplay').onclick = replayCurrentAudio;
+    
     document.getElementById('restartBtn').onclick = () => {
         playSnd('tap');
         location.reload(); 
@@ -483,6 +472,8 @@
     document.getElementById('muteBtn').onclick = () => { 
         isMuted = !isMuted; 
         document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🔊'; 
+        // Si muteamos, cancelamos el TTS actual
+        if (isMuted) speechSynthesis.cancel();
     };
 </script>
 </body>
