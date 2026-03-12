@@ -207,7 +207,7 @@
     </section>
 
     <section class="screen" id="finalScreen">
-        <header><h1 style="color: var(--blue-dark);">Partes de un ordenador</h1></header>
+        <header><h1 style="color: var(--blue-dark);">Las normas de seguridad</h1></header>
         <div class="results">
             <div id="trophyBox">🏆</div>
             <div style="font-size: 1.5rem; font-weight: 700;">Puntuación:</div>
@@ -250,6 +250,7 @@
     let currentQuestionIdx = 0;
     let activeQuestions = [];
     let score = 0;
+    let audioContext; // Variable para el contexto de audio
     
     // Precarga de audios
     const audioObjects = {};
@@ -258,12 +259,31 @@
         audioObjects[key].load();
     });
 
+    // --- FIX CHROMEOS: Desbloqueo de Audio ---
+    function unlockAudioContext() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        // Crear y reproducir un buffer silencioso para activar el motor
+        const buffer = audioContext.createBuffer(1, 1, 22050);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start(0);
+    }
+
     // --- Configuración Voz (SpeechSynthesis) ---
     let voiceSelected = null;
+    let voicesLoaded = false; // Flag para saber si las voces están listas
 
     function loadVoices() {
         const voices = speechSynthesis.getVoices();
         if (voices.length === 0) return;
+
+        voicesLoaded = true;
 
         // 1. Prioridad Google
         let foundVoice = voices.find(v => v.name === "Google español");
@@ -291,6 +311,15 @@
         speechSynthesis.onvoiceschanged = loadVoices;
     }
     loadVoices(); // Intento inicial
+
+    // FIX CHROMEOS: Forzar inicialización de TTS
+    function forceInitTTS() {
+        if (!voicesLoaded) {
+            // Si las voces no cargaron al inicio, forzamos un utterance vacío para activar el motor
+            const tempUtterance = new SpeechSynthesisUtterance('');
+            speechSynthesis.speak(tempUtterance);
+        }
+    }
 
     function speakText(text) {
         if (isMuted) return;
@@ -351,9 +380,9 @@
     // --- Lógica del Juego ---
 
     function startGame() {
-        // Desbloqueo de AudioContext
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        if (context.state === 'suspended') context.resume();
+        // FIX: Desbloquear audio y TTS al iniciar
+        unlockAudioContext();
+        forceInitTTS();
         
         playSnd('tap');
         showScreen('gameScreen');
@@ -394,6 +423,8 @@
 
     // Función para el botón de replay manual
     function replayCurrentAudio() {
+        // Asegurar que el audio esté desbloqueado al pulsar el botón
+        unlockAudioContext();
         if (currentQuestionIdx < activeQuestions.length) {
             speakText(activeQuestions[currentQuestionIdx].text);
         }
@@ -419,6 +450,10 @@
 
     function endGame() {
         clearInterval(timerInterval);
+        
+        // FIX: Cancelar audios TTS al terminar
+        speechSynthesis.cancel();
+        
         showScreen('finalScreen');
         
         const totalQuestions = activeQuestions.length;
